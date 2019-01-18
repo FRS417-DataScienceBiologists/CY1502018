@@ -9,14 +9,41 @@ output:
 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
 
-```{r}
+
+```r
 5 - 3 * 2
+```
+
+```
+## [1] -1
+```
+
+```r
 8 / 2 ** 2
+```
+
+```
+## [1] 2
+```
+
+```r
 (5 - 3) * 2
+```
+
+```
+## [1] 4
+```
+
+```r
 (8 / 2) ** 2
 ```
 
-```{r}
+```
+## [1] 16
+```
+
+
+```r
 blackjack <- c(140, -20, 70, -120, 240)
 roulette <- c(60, 50, 120, -300, 10)
 days <- c('Monday','Tuesday','Wednesday','Thursday','Friday')
@@ -26,17 +53,37 @@ total_blackjack <- sum(blackjack)
 total_blackjack
 ```
 
-```{r}
+```
+## [1] 310
+```
+
+
+```r
 total_roulette <- sum(roulette)
 total_roulette
 ```
 
-```{r}
+```
+## [1] -60
+```
+
+
+```r
 total_week <- blackjack + roulette
 total_week
 ```
 
-```{r}
+```
+##    Monday   Tuesday Wednesday  Thursday    Friday 
+##       200        30       190      -420       250
+```
+
+
+```r
 pmax(total_blackjack, total_roulette) == total_blackjack
+```
+
+```
+## [1] TRUE
 ```
 
