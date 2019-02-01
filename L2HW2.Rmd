@@ -1,0 +1,58 @@
+---
+title: "L2HW2"
+author: "CY"
+date: "1/30/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+```{r}
+library("tidyverse")
+library("dplyr")
+msleep
+```
+
+1. Use command line "?msleep" to get publication info on the dataset.
+
+2. The following command lines show us the variables and structure of dataset msleep.
+```{r}
+names(msleep)
+str(msleep)
+```
+
+3. With the select function we can select and display the variable of interest (bodyweight).
+```{r}
+Bodyweight <- select(msleep,name, genus, bodywt)
+Bodyweight
+```
+
+4. Large mammals dataframe:
+```{r}
+LargeMammals <- subset(msleep, bodywt >= 200)
+LargeMammals %>%
+   arrange(desc(bodywt))
+```
+Small mammals dataframs:
+```{r}
+SmallMammals <- subset(msleep, bodywt <= 1)
+SmallMammals %>%
+   arrange(desc(bodywt))
+```
+
+5.6. Average sleep duration:
+```{r}
+mean(LargeMammals$sleep_total) 
+mean(SmallMammals$sleep_total)
+```
+
+7. Animals sleeping longer than 18 hours per day:
+```{r}
+msleep %>%
+  select(name, genus, sleep_total) %>%
+  filter(sleep_total >= 18) %>%
+  arrange(desc(sleep_total))
+```
+
+
