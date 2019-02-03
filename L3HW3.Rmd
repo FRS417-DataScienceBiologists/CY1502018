@@ -1,0 +1,73 @@
+---
+title: "L3HW3"
+author: "CY"
+date: "2/1/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+fisheries <- readr::read_csv(file = "FAO_1950to2012_111914.csv") 
+```
+
+```{r}
+names(fisheries) = make.names(names(fisheries), unique=T)
+names(fisheries)
+```
+
+3. Rename the columns:
+```{r}
+library(data.table)
+setnames(fisheries, old = c('Country..Country.','Species..ASFIS.species.','Species..ASFIS.species._2','Species..ASFIS.species._1','Species..ISSCAAP.group.','Species..ISSCAAP.group._1','Fishing.area..FAO.major.fishing.area.','Measure..Measure.'), new = c('country','commname','sciname','spcode','spgroup','spgroupname','region','unit') )
+names(fisheries)
+```
+
+4. These data after renaming are not tidy enough. Some of the columns are still variables and some observations are goruped in a single row by one variable.
+
+5. Tidying the Data:
+```{r}
+fisheries_tidy <-
+  fisheries %>% 
+  gather(num_range('X',1950:2012), key='year', value='catch')
+```
+
+6. Glimpsing:
+```{r}
+glimpse(fisheries_tidy)
+```
+Problem: Many missing unit cells in catch column.
+
+7. Removing empty entries:
+```{r}
+fisheries_tidy <- 
+  fisheries_tidy %>% 
+  mutate(
+    year= as.numeric(str_replace(year, 'X', '')),
+    catch= as.numeric(str_replace(catch, c('F','...','-'), replacement = ''))
+  )
+```
+
+8.I think the data looks pretty tidy now!
+
+9.Restrcting dataframe:
+```{r}
+fisheries_tidy %>%
+  select(country,sciname,spgroupname,year,catch) %>%
+  filter(year == 2008 | 2009 | 2010| 2011 |2012, sciname == "cephalopo") %>%
+  arrange(desc(catch))
+```
+
+10. Consumptions:
+```{r}
+cuttle <- fisheries_tidy %>%
+  select(country,sciname,commname,year,catch) %>%
+  filter(commname == "Common cuttlefish") %>%
+  arrange(desc(catch))
+```
+
+
+
