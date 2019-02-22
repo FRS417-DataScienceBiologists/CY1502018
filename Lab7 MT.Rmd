@@ -1,0 +1,84 @@
+---
+title: "Lab7 Part2 (MT)"
+author: "CY"
+date: "2/22/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library("tidyverse")
+CAcollege <- readr::read_csv("desktop/ca_college_data.csv")
+```
+
+```{r}
+is.na(CAcollege)
+```
+
+```{r}
+CAcollege %>% 
+  summarize(number_nas= sum(is.na(CAcollege)))
+```
+
+```{r}
+CAcollege %>% 
+  purrr::map_df(~ sum(is.na(.))) %>% 
+  tidyr::gather(key="variables", value="num_nas") %>% 
+  arrange(desc(num_nas))
+```
+
+```{r}
+CAcollege_na <- 
+  CAcollege %>%
+  purrr::map_df(~ sum(is.na(.)))
+CAcollege_na
+```
+
+```{r}
+CAcollege_na2 <- 
+  CAcollege %>% 
+  na_if("") 
+CAcollege_na2
+```
+
+```{r}
+CAcollege %>% 
+  arrange(CITY)
+```
+
+```{r}
+CAcollege %>% 
+  arrange(CITY)
+```
+
+
+
+
+```{r}
+CAcollege %>%
+na.omit(CAcollege)
+ggplot(data=CAcollege, mapping=aes(x=ADM_RATE, y=C150_4_POOLED)) +
+  geom_point()
+```
+
+```{r}
+univ_calif <- 
+  CAcollege %>% 
+  filter_all(any_vars(str_detect(., pattern = "University of California")))
+univ_calif
+```
+The results seem to be tidy, with all variables having their own columns and no empty rows.
+
+```{r}
+univ_calif %>%
+  separate(INSTNM, into=c("UNIV","CAMPUS"), sep = "-")
+```
+
+```{r}
+
+```
+
+
