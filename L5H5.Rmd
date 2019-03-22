@@ -1,0 +1,124 @@
+---
+title: "HW5"
+author: "CY"
+date: "2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library("tidyverse")
+library("skimr")
+```
+
+1. Loading the data:
+```{r}
+life_history <- 
+  readr::read_csv(file = "417/mammal_lifehistories_v2.csv")
+```
+
+2. An overview of the dataframe:
+```{r}
+life_history %>%
+  skimr::skim()
+```
+
+3. Gettint rid of NAs:
+```{r}
+life_history <- life_history %>% 
+  na_if("-999")
+```
+
+4. Showing where the NAs are:
+```{r}
+life_history %>%
+  purrr::map_df(~ sum(is.na(.)))%>% 
+  tidyr::gather(variables, num_nas) %>% 
+  arrange(desc(num_nas))
+```
+
+5. Renaming some of the variables:
+```{r}
+life_history <- 
+  life_history %>%  
+  dplyr::rename(
+          genus        = Genus,
+          wean_mass    = `wean mass`,
+          max_life     = `max. life`,
+          litter_size  = `litter size`,
+          litters_yr   = `litters/year`
+          )
+life_history
+```
+
+6. Making plot for relationship between newborns and gestation:
+```{r}
+life_history %>%
+  ggplot(aes(x=newborn, y=gestation))+
+  geom_point(shape = 18)+
+  labs(title = "Relationship between newborns and gestation",
+       x = "Newborns",
+       fill= "Gestation")+
+  theme(plot.title = element_text(size = 14, face = "bold"),
+        axis.text = element_text(size = 10),
+        axis.title = element_text(size = 10))
+  
+```
+
+7.8. Beautifying the previous plot with better scale and colors:
+```{r}
+life_history %>%
+  ggplot(aes(x=newborn, y=gestation))+
+  geom_point(shape = 21, colour = "black", fill = "steelblue", size = 1, stroke = 0.5, alpha=0.75)+
+  scale_x_log10()+
+  labs(title = "Relationship between newborns and gestation",
+       x = "Newborns",
+       fill= "Gestation")+
+  theme(plot.title = element_text(size = 14, face = "bold"),
+        axis.text = element_text(size = 10),
+        axis.title = element_text(size = 10))
+```
+
+```{r}
+life_history %>%
+  ggplot(aes(x=newborn, y=gestation, color=order))+
+  geom_point()+
+  scale_x_log10()+
+  labs(title = "Relationship between newborns and gestation",
+       x = "Newborns",
+       fill= "Gestation")+
+  theme(plot.title = element_text(size = 14, face = "bold"),
+        axis.text = element_text(size = 10),
+        axis.title = element_text(size = 10))
+  
+```
+
+9. Make points' size proportional to body mass:
+```{r}
+life_history %>%
+  ggplot(aes(x=newborn, y=gestation, color=order, size=mass))+
+  geom_point()+
+  scale_x_log10()+
+  labs(title = "Gestation vs Newborn Mass",
+       x = "Newborn mass",
+       y = "Gestation",
+       color="Taxonomic Order")
+```
+
+10. Making boxplot for range of lifespan:
+```{r}
+life_history %>% 
+  ggplot(aes(x=order, y=max_life, fill=order))+
+  geom_boxplot()+
+  scale_y_log10()+
+  labs(title = "Lifespan, Taxonomic Order",
+       x = "Taxonomic Order",
+       y = "Lifespan",
+       fill="Taxonomic Order")+
+  theme(legend.position = "left")+
+  coord_flip()
+```
+

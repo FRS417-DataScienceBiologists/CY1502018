@@ -1,0 +1,160 @@
+---
+title: "R_Presentation"
+author: "CY"
+date: "3/15/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library("tidyverse")
+library("skimr")
+```
+ 
+From the authors of the data source:
+"The aim of this study was to unravel the role of predation  in  key pests (A.  aurantii) associated with perennial citrus crops by quantifying the importance of species-specific trophic links employing, among  others, molecular  techniques.
+Specifically,  i)  the  contribution  of  predation  as  a biotic  mortality  factor  of A. aurantiiwas weighted using exclusion  techniques and ii) the  relative importance of potential predators was assessed through detection of prey DNA in theirgut contents."
+
+```{r}
+predation <- readr::read_csv("L8/Predation_Data.csv")
+```
+
+```{r}
+#deleted the columns of the comments the authors made in the original data with df <- df [-c(col:col')]
+predation <- predation [-c(17:21)]
+summary(predation)
+```
+
+What does this dataframe look like?
+```{r}
+predation %>% 
+  skimr::skim()
+```
+
+```{r}
+names(predation)
+```
+
+To understand how A. aurantii individuals' predation affect the trees they prey on, let's take a look at the tree samples used in this study! What are their orientations and what parts of them were compared? 
+```{r}
+predation %>%
+  select(TREE, `TREE WRIENTATIWN`, `PLANT PART`, TREATMENT) %>%
+  filter(TREATMENT == "Predation") %>%
+  arrange(`PLANT PART`)
+```
+
+What are the mortality and parasitism rates after A. aurantii's predation?
+```{r}
+predation %>%
+  select(TREE, TREATMENT, MORTALITY, PARASITISM) %>%
+  filter(TREATMENT == "Predation") %>%
+  arrange(-`MORTALITY`)
+```
+
+Let's see if there is a correlation between predation and tree mortality!
+```{r}
+ggplot(data=predation, mapping=aes(x=TREATMENT, y=MORTALITY, group = TREATMENT, fill = TREATMENT)) +
+  geom_boxplot()
+```
+
+Are trees that became parasited more prone to die?
+```{r}
+predation %>%
+  filter(PARASITISM > 1) %>%
+  ggplot(mapping=aes(y=0.01 * PARASITISM, x= 0.01 * MORTALITY, color = `PLANT PART`)) +
+  geom_point()+
+  scale_colour_brewer(palette = "Dark2")+
+  geom_smooth(method = lm, se = FALSE)+
+  labs(title = "Parasitism Rate vs. Mortality",
+       y = "Parasitism rate",
+       x = "Mortality")+
+  theme(plot.title = element_text(size = 14, face = "bold"),
+        axis.text = element_text(size = 12),
+        axis.title = element_text(size = 12))
+```
+
+Do A. aurantii smaple individuals have a favorite part of the tree to predate on?
+```{r}
+predation %>% 
+  ggplot(aes(x=`PREDATED SCALES`, fill=`PLANT PART`))+
+  geom_bar(position = position_fill(), stat = "count")+ 
+  scale_y_continuous(labels = scales::percent)+
+  labs(title = "Observations by tree parts that were predated",
+       x = "Parts of the tree", 
+       y = "Percent that were predated",
+       fill= "Parts")+
+  coord_flip()+
+  theme(plot.title = element_text(size = 14, face = "bold"),
+        axis.text = element_text(size = 12),
+        axis.title = element_text(size = 12))
+```
+
+Leaf seems to be the preferred part to predate on for Aurantii individuals; let's now see if there is such a relationship between trees' orientation too!
+```{r}
+predation %>% 
+  filter(`PREDATED SCALES` > 30 & `PREDATED SCALES` < 42) %>%
+  ggplot(aes(x=`PREDATED SCALES`, fill=`GENERATION`))+
+geom_bar(alpha=0.9, na.rm=T, position="dodge")+
+  theme(legend.position = "right",
+        axis.text.x = element_text(angle = 60, hjust=1))+
+  labs(title = "Observations by generations of the predated trees",
+       x = "Predation scales",
+       fill= "Generation")+
+theme(plot.title = element_text(size = 14, face = "bold"),
+        axis.text = element_text(size = 12),
+        axis.title = element_text(size = 12))
+```
+
+We now know that there is a positive correlation between mortality and A. aurantii predation, does that have anything to do with the aurantii individuals' preferred parts of the tree?
+```{r}
+predation %>% 
+  ggplot(aes(x=`PREDATED SCALES`, y=MORTALITY, color=`PLANT PART`))+
+  geom_point()+
+  geom_point(shape = 18)+
+  labs(title = "Observations of mortality in relation to predation, grouped by plant parts",
+       x = "# Predation",
+       fill= "Plant Parts")+
+  theme(plot.title = element_text(size = 14, face = "bold"),
+        axis.text = element_text(size = 10),
+        axis.title = element_text(size = 10))
+
+```
+
+
+Now, let's see if mortality rate has a different distribution between different parts of the sample trees!
+```{r}
+predation %>%
+  ggplot(aes(x = MORTALITY)) +
+  geom_histogram() +
+  facet_wrap(~`PLANT PART`)
+```
+
+
+
+```{r}
+predation %>%
+  filter(MORTALITY > 50) %>%
+  ggplot(aes(x = MORTALITY)) +
+  geom_density(fill="steelblue", alpha=0.4)+
+  facet_wrap(~`PLANT PART`)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

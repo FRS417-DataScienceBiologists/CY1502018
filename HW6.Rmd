@@ -1,0 +1,149 @@
+---
+title: "HW6"
+author: "CY"
+date: "2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library("gapminder")
+library("skimr")
+library("RColorBrewer")
+library("tidyverse")
+```
+
+```{r}
+gapminder <- 
+  gapminder::gapminder
+```
+
+1. Overview of the dataframe:
+```{r}
+glimpse(gapminder)
+```
+
+```{r}
+gapminder %>%
+  summarize(number_nas= sum(is.na(gapminder)))
+```
+```{r}
+skimr::skim(gapminder)
+```
+
+2. GPD and life expectancy:
+```{r}
+gapminder %>%
+  ggplot(aes(x=gdpPercap, y=lifeExp))+
+  geom_point(size = 0.2)+
+  geom_smooth(method = lm, se = TRUE)+
+  labs(title = "Life Expectancy and GDP",
+       x = "GDP",
+       y = "Life expectancy")
+```
+
+3. Rescaling the graph:
+```{r}
+gapminder %>%
+  ggplot(aes(x=gdpPercap, y=lifeExp))+
+  geom_point(size = 0.4)+
+  scale_x_log10()+
+  geom_smooth(method = lm, se = TRUE)+
+  labs(title = "Life Expectancy and GDP",
+       x = "GDP",
+       y = "Life expectancy")
+```
+
+4. Faceting the graph:
+```{r}
+gapminder %>%
+  ggplot(aes(x=gdpPercap, y=lifeExp))+
+  geom_point(size=0.3)+
+  scale_x_log10()+
+  facet_wrap(~year)+
+  labs(title = "Life Expectance and GDP")
+```
+
+5. Filter the graph:
+```{r}
+gapminder %>%
+  filter(year==1952 | year==2007) %>% 
+  ggplot(aes(x=gdpPercap, y=lifeExp))+
+  geom_point(size=0.3)+
+  scale_x_log10()+
+  facet_wrap(~year)+
+  labs(title = "Life Expectance and GDP")
+```
+
+6.More Filtering:
+```{r}
+gapminder %>%
+  filter(year==1952 | year==2007) %>% 
+  ggplot(aes(x=gdpPercap, y=lifeExp, size = pop, color = continent))+
+  geom_point(size=0.3)+
+  scale_x_log10()+
+  facet_wrap(~year)+
+  labs(title = "Life Expectance and GDP, Refined")+
+  scale_size(range = c(0.1, 10))
+```
+
+7. Applying a theme to the plot:
+
+8.Population barlplot:
+```{r}
+gapminder %>%
+  filter(year==2007 & continent=="Asia") %>% 
+  ggplot(aes(x=reorder(country, pop), y=pop))+
+  geom_col(fill="green", alpha=0.6)+
+  coord_flip()+
+  labs(title = "Population, Asia",
+       x = "Population",
+       y = "Country")
+```
+
+9.Population change:
+```{r}
+gapminder %>%
+  filter(country=="China") %>% 
+  ggplot(aes(x=factor(year), y=pop))+
+  geom_bar(stat="identity")+
+  labs(title = "Population Growth", x = "Year", y = "Population")+
+  coord_flip()
+```
+
+10. Population comparison:
+```{r}
+gapminder %>%
+  filter(country=="India" | country=="China") %>% 
+  ggplot(aes(x=factor(year), y=pop, fill=country))+
+  geom_bar(stat="identity", position="dodge")+
+  labs(title = "Population Growth, compared",
+       x = "Year",
+       y = "Pop")
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

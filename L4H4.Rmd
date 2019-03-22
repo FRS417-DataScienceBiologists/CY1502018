@@ -1,0 +1,90 @@
+---
+title: "L4H4"
+author: "CY"
+date: "2/4/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+life_history <- readr::read_csv("417/mammal_lifehistories_v2.csv")
+```
+
+```{r}
+life_history <- 
+  life_history %>% 
+  dplyr::rename(
+          genus        = Genus,
+          wean_mass    = `wean mass`,
+          max_life     = `max. life`,
+          litter_size  = `litter size`,
+          litters_yr   = `litters/year`
+          )
+```
+
+```{r}
+library("skimr")
+```
+
+```{r}
+life_history %>% 
+  skimr::skim()
+```
+
+```{r}
+msleep %>% 
+  summarize(number_nas= sum(is.na(life_history)))
+```
+2. There are no NAs in this dataset, which seems unlikely given the size of the data.
+
+
+3. Yes. We can see from the variable typr summary above that many missing complete values were replaces with the -999. The most missing values occur at the wean mess category, which could be the result of data collection difficulty.
+
+```{r}
+life_history <- 
+  life_history %>% 
+  na_if(-999.0)
+```
+```{r}
+life_history %>% 
+  skimr::skim()
+life_history %>%
+  purrr::map_df(~ sum(is.na(.)))%>% 
+  tidyr::gather(variables, num_nas) %>% 
+  arrange(desc(num_nas))
+```
+
+4. Number of observations, grouped by taxonomic order.
+```{r}
+life_history %>%
+  group_by(order) %>% 
+  summarize(n())
+```
+
+5.Summary of mammal lifespan:
+```{r}
+life_history %>%
+  mutate(lifespan=max_life/12) %>% 
+  group_by(order) %>%
+  summarize(min=min(lifespan, na.rm=TRUE),
+            max=max(lifespan, na.rm=TRUE),
+            mean=mean(lifespan, na.rm=TRUE),
+            sd=sd(lifespan, na.rm=TRUE),
+            total=n())
+```
+
+6. Gestation and Newborns:
+```{r}
+life_history %>% 
+  group_by(order) %>% 
+  summarize(mean_gestation=mean(gestation, na.rm=TRUE),
+            mean_newborn_mass=mean(newborn, na.rm=TRUE),
+            mean_wean_mass=mean(wean_mass, na.rm=TRUE),
+            total=n()) %>% 
+  arrange(desc(mean_gestation))
+```
+
